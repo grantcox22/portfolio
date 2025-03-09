@@ -7,9 +7,7 @@ import ConsoleInput from "@/components/console-input";
 import { ConsoleLine as _ConsoleLine } from "@/lib/console";
 import { useFileSystem } from "@/hooks/use-filesystem";
 import { useSession } from "next-auth/react";
-
-const welcomeMessage =
-  'Welcome to the console (v0.0.1)\n<span className="ml-2">* Type "help" to see a list of available commands</span>\n';
+import { welcomeMessage } from "@/lib/copy";
 
 export default function Console({ serverUser }: any) {
   const _console = useConsoleState();
@@ -45,7 +43,7 @@ export default function Console({ serverUser }: any) {
   }, [_console.lines]);
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto max-h-[calc(100vh-12.75rem)] p-3 rounded-b-md">
+    <div className="w-full flex flex-col overflow-y-auto max-h-[calc(100vh-12.75rem)] p-3 rounded-b-md scrollbar-thin">
       {_console.lines.map((line, index) => (
         <>
           {index !== _console.lines.length - 1 ? (

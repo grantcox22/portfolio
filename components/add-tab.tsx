@@ -63,7 +63,7 @@ export function AddTab() {
         }}
       />
       {dropdownOpen && (
-        <div className="absolute top-[34px] left-[6px] bg-neutral-700 rounded-md p-2 w-48 text-sm space-y-1">
+        <div className="absolute top-[34px] left-[6px] bg-neutral-700 rounded-md p-2 w-48 text-sm space-y-1 z-50">
           {availableTabs.map((tab, index) => (
             <Link
               href={getPath(tab.path, navbar.routes)}

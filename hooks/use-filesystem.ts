@@ -1,3 +1,4 @@
+import { readme } from "@/lib/copy";
 import { File, Folder, getFolder, recursiveRmFolder } from "@/lib/filesystem";
 import { get } from "http";
 import { init } from "next/dist/compiled/webpack/webpack";
@@ -5,6 +6,7 @@ import { create } from "zustand";
 
 type FileSystemState = {
   root: Folder;
+  initialized: boolean;
   currentPath: string;
   currentFolder?: Folder;
   addFile: (l: { file: File; path?: string; overwrite?: boolean }) => boolean;
@@ -21,35 +23,26 @@ type FileSystemState = {
 export const useFileSystem = create<FileSystemState>((set) => ({
   root: {
     name: "root",
-    files: {},
+    files: {
+      "README.md": {
+        name: "README.md",
+        content: readme,
+      },
+    },
     folders: {
-      home: {
-        name: "home",
-        files: {
-          "ABOUTME.md": {
-            name: "ABOUTME.md",
-            content: "I'm a software engineer",
-          },
-          "contact.txt": {
-            name: "contact.txt",
-            content: "grant cox",
-          },
-        },
-        folders: {
-          user: {
-            name: "user",
-            files: {},
-            folders: {},
-          },
-          document: {
-            name: "document",
-            files: {},
-            folders: {},
-          },
-        },
+      users: {
+        name: "users",
+        files: {},
+        folders: {},
+      },
+      resources: {
+        name: "resources",
+        files: {},
+        folders: {},
       },
     },
   },
+  initialized: false,
   currentPath: "root",
   currentFolder: undefined,
   addFile: ({ file, path, overwrite }) => {
@@ -68,6 +61,8 @@ export const useFileSystem = create<FileSystemState>((set) => ({
     let fileRemoved = -1;
     set((state) => {
       let folder = state.currentFolder ?? state.root;
+      if (path) {
+      }
       if (folder.folders[fileName] && !folder.files[fileName]) {
         fileRemoved = -2;
         return {};
@@ -129,32 +124,19 @@ export const useFileSystem = create<FileSystemState>((set) => ({
   changePath: (path) => {
     let result = true;
     set((state) => {
-      let folder: Folder | undefined = state.currentFolder ?? state.root;
-      if (path === "root") {
-        return { currentPath: "root", currentFolder: state.root };
-      }
-      let currentPath = state.currentPath;
-      while (path.startsWith("..") && currentPath !== "root") {
-        let pathArray = state.currentPath.split("/");
-        pathArray.pop();
-        currentPath = pathArray.join("/");
-        currentPath.slice(0, currentPath.length - 1);
-        folder = getFolder(currentPath, state.root);
-        if (path.length >= 2) path = path.slice(2) || "";
-        if (path.startsWith("/")) path = path.slice(1) || "";
-      }
-      if (path === "..")
-        return { currentPath: "root", currentFolder: state.root };
-      folder = getFolder(`${path}`, folder ?? state.root);
-      if (folder === undefined) {
+      let folder = getFolder(
+        path,
+        state.root,
+        state.currentPath,
+        state.currentFolder
+      );
+      if (!folder) {
         result = false;
-        return {
-          currentPath: state.currentPath,
-        };
+        return {};
       }
       return {
-        currentPath: `${currentPath}${path !== "" ? "/" : ""}${path}`,
-        currentFolder: folder ?? state.currentFolder,
+        currentPath: folder?.path ?? state.currentPath,
+        currentFolder: folder?.folder ?? state.currentFolder,
       };
     });
     return result;

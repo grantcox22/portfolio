@@ -50,16 +50,17 @@ export function NavbarItem({
           isActive && "bg-gray-950 rounded-t-lg"
         )}
       >
-        <Link
-          href={path}
-          className="ml-2 flex items-center overflow-hidden text-clip whitespace-nowrap h-full "
-        >
+        <Link href={path} className="ml-2 flex items-center flex-grow h-full ">
           <Icon className="mr-2 w-3.5 h-3.5" />
           <span className="text-sm">{label}</span>
         </Link>
         <Link
           href={deleteRoute}
           onClick={(e) => {
+            if (navbar.routes.length === 1) {
+              e.preventDefault();
+              return;
+            }
             if (!isActive) e.preventDefault();
             navbar.removeRoute(path);
           }}

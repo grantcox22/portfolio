@@ -8,8 +8,8 @@ import path from "path";
 import bcrypt from "bcryptjs";
 import { signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
-
-const helpMessage = `==== Help ====\nclear\nls\npwd\ncd [dir]\nmkdir [dir]\nrmdir [dir] [-r]\nrm [file]\ntouch [file]\necho [-neE] [... arg]\ncat [file]\nlogin [user]\nlogout\nversion`;
+import { version } from "@/components/version";
+import { help, helpMessage } from "./copy";
 
 export enum OpCode {
   CLEAR,
@@ -158,6 +158,17 @@ const commands: Command[] = [
   {
     command: "help",
     func: (args: string[]) => {
+      if (args.length === 1) {
+        if (help[args[0]]) {
+          return { content: help[args[0]] };
+        } else {
+          return {
+            content: `help: ${args[0]}: e|command not found|`,
+            error: true,
+          };
+        }
+      }
+      if (args.length > 1) return { content: "help: e|invalid arguments|" };
       return {
         content: helpMessage,
       };
@@ -173,7 +184,7 @@ const commands: Command[] = [
   {
     command: "version",
     func: (args: string[]) => {
-      return { content: "v5.0.1" };
+      return { content: version };
     },
   },
   {
@@ -266,7 +277,7 @@ export async function processCommand(
     case OpCode.LOGIN:
       if (_console.currentUser) {
         message = "login: e|already logged in|";
-        break
+        break;
       }
       await consoleLogin(_console, processingInputState, output.content);
       return;
@@ -284,22 +295,26 @@ export async function processCommand(
       break;
   }
 
-  if (!!message) _console.addLine({
-    content: message,
-    path: filesystem.currentPath,
-  });
+  if (!!message)
+    _console.addLine({
+      content: message,
+      path: filesystem.currentPath,
+    });
 }
 
 function cd(output: Output, filesystem: any) {
+  // check if more than one slash is used in a row
+  if (output.content.match(/\/\/+/gm)) {
+    return "cd: e|invalid path|";
+  }
   if (output.content === "/" || output.content === "~") {
     filesystem.changePath("root");
     return;
   }
   if (!filesystem.changePath(output.content)) {
-    return `cd: no such file or directory: ${output.content}`;
+    return `cd: ${output.content}: e|no such file or directory|`;
   }
 }
-
 
 function pwd(filesystem: any) {
   return filesystem.currentPath;
@@ -318,12 +333,12 @@ function ls(filesystem: any) {
   return directory;
 }
 
-
 function add(output: Output, filesystem: any) {
   let addF = filesystem.addFile({
     file: { name: output.content, content: "" },
     path: filesystem.currentPath,
-    overwrite: output?.flags?.includes("--overwrite") || output?.flags?.includes("-o"),
+    overwrite:
+      output?.flags?.includes("--overwrite") || output?.flags?.includes("-o"),
   });
   if (!addF) return `touch: ${output.content}: e|File already exists|`;
 }
@@ -332,7 +347,8 @@ function echoAdd(output: Output, filesystem: any) {
   if (!output.flags) return "echo: e|missing file name|";
   let eaddF = filesystem.addFile({
     file: { name: output.flags[0], content: output.content },
-    overwrite: output?.flags?.includes("--overwrite") || output?.flags?.includes("-o"),
+    overwrite:
+      output?.flags?.includes("--overwrite") || output?.flags?.includes("-o"),
   });
   if (!eaddF) return `echo: ${output.flags[0]}: e|File already exists|`;
 }
@@ -359,7 +375,9 @@ function mkdir(output: Output, filesystem: any) {
 function rmdir(output: Output, filesystem: any) {
   let rmDir = filesystem.rmDir({
     folderName: output.content,
-    recursive: !!output?.flags?.includes("-r"),
+    recursive:
+      !!output?.flags?.includes("-r") ||
+      !!output?.flags?.includes("--recursive"),
   });
   switch (rmDir) {
     case -1:
@@ -376,9 +394,8 @@ function rmdir(output: Output, filesystem: any) {
 }
 
 function cat(output: Output, filesystem: any) {
-  let file = getFolder(filesystem.currentPath, filesystem.root)?.files[
-    output.content
-  ];
+  let folder = filesystem.currentFolder ?? filesystem.root;
+  let file = folder?.files[output.content];
   if (!file) {
     return `cat: ${output.content}: e|No such file or directory|`;
   }

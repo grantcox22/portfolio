@@ -32,7 +32,6 @@ export default function ConsoleLine({ line }: ConsoleLineProps) {
 export function ConsoleTypingLine({ line }: ConsoleLineProps) {
   const [_line, setLine] = React.useState("");
   React.useEffect(() => {
-    clearInterval(undefined);
     if (line?.input) setLine(line.content);
     else {
       setLine("");
@@ -61,6 +60,8 @@ const formatLine = (content: string) => {
     /e\|(.*?)\|/gm,
     "<span class='text-red-500'>$1</span>"
   );
+  content = content.replace(/tt\|(.*?)\|/gm, "<div class='ml-8'>$1</div>");
+  content = content.replace(/t\|(.*?)\|/gm, "<div class='ml-3'>$1</div>");
   if (content.includes("\n")) {
     return content
       .split("\n")

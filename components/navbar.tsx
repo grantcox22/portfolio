@@ -27,8 +27,8 @@ export default function Navbar() {
             path={route.path}
             icon={route.icon}
             navbar={navbar}
-            isActive={route.path === currPath}
             router={router}
+            isActive={route.path === currPath}
           />
         ))}
         <AddTab />
