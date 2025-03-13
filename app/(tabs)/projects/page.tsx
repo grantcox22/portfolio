@@ -1,6 +1,6 @@
-import Home from "./_components/home-container";
 import { db } from "@/lib/db";
-export default async function HomePage() {
+
+export default async function Projects() {
   const projects = await db.project.findMany({
     where: {
       isPublished: true,
@@ -18,5 +18,9 @@ export default async function HomePage() {
     take: 3,
   });
 
-  return <Home projects={projects} />;
+  return (
+    <div>
+      <h1>Projects</h1>
+    </div>
+  );
 }

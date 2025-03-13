@@ -9,6 +9,8 @@ interface NavbarItemProps {
   isActive: boolean;
   navbar: any;
   router: any;
+  pinned?: boolean;
+  noX?: boolean;
 }
 
 export function NavbarItem({
@@ -17,22 +19,27 @@ export function NavbarItem({
   isActive,
   icon: Icon,
   navbar,
+  pinned,
+  noX,
 }: NavbarItemProps) {
   let deleteRoute = "/";
   if (navbar.routes.length > 1) {
     let index = navbar.routes.findIndex((r: any) => r.path === path);
     if (index == 0) deleteRoute = navbar.routes[1].path;
-    else deleteRoute = navbar.routes[index - 1].path;
+    else deleteRoute = navbar.routes[index - 1]?.path;
   }
 
   return (
     <div
       draggable={true}
-      className="flex items-center relative mx-0.5 h-8 flex-grow max-w-48"
+      className={cn(
+        "flex items-center relative mx-0.5 h-8 w-full max-w-48 overflow-hidden",
+        pinned && "max-w-10"
+      )}
     >
       <div
         className={cn(
-          "w-2 h-2 absolute left-[-8px] bottom-0",
+          "w-2 h-2 absolute left-[-8px] bottom-0 bg-none",
           isActive && "bg-gray-950"
         )}
       >
@@ -45,28 +52,36 @@ export function NavbarItem({
       </div>
       <div
         className={cn(
-          "h-full w-full flex items-center rounded-t-lg text-sm justify-between z-50 ",
+          "h-full w-full flex items-center rounded-t-lg text-sm justify-between z-50 overflow-hidden relative group",
           !isActive && "hover:bg-gray-950/80",
           isActive && "bg-gray-950 rounded-t-lg"
         )}
       >
-        <Link href={path} className="ml-2 flex items-center flex-grow h-full ">
-          <Icon className="mr-2 w-3.5 h-3.5" />
-          <span className="text-sm">{label}</span>
-        </Link>
         <Link
-          href={deleteRoute}
-          onClick={(e) => {
-            if (navbar.routes.length === 1) {
-              e.preventDefault();
-              return;
-            }
-            if (!isActive) e.preventDefault();
-            navbar.removeRoute(path);
-          }}
+          href={path}
+          className={cn(
+            "ml-2 flex items-center flex-grow h-full text-clip text-nowrap",
+            pinned && "px-1"
+          )}
         >
-          <X className="w-4 h-4 rounded-[8px] p-[2px] hover:bg-gray-800/80 cursor-pointer mr-1" />
+          <Icon className={cn("w-3.5 h-3.5", !pinned && "mr-2")} />
+          {!pinned && <span className="text-sm ">{label}</span>}
         </Link>
+        {!pinned && !noX && (
+          <Link
+            className={cn(
+              "flex items-center justify-center h-full px-1 absolute right-0 bg-neutral-700 parent-hover group-hover:bg-gray-950/0",
+              isActive && "bg-gray-950"
+            )}
+            href={deleteRoute}
+            onClick={(e) => {
+              if (!isActive) e.preventDefault();
+              navbar.removeRoute(path);
+            }}
+          >
+            <X className="w-6 h-6 rounded-lg p-1 hover:bg-gray-800/80 cursor-pointer" />
+          </Link>
+        )}
       </div>
       <div
         className={cn(

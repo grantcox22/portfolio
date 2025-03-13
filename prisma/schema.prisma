@@ -56,3 +56,48 @@ model Files {
 
   @@index([folderId])
 }
+
+model Category {
+  id String @id @default(cuid())
+  name String
+
+  projects Project[] @relation(name: "Category")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id String @id @default(cuid())
+  name String
+  coverArt String?
+  description String? @db.Text
+
+  projectLink String?
+  articleLink String?
+  githubLink String?
+
+  sku String? @unique
+
+  category Category[] @relation(name: "Category")
+
+  isPublished Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Article {
+  id String @id @default(cuid())
+  title String
+  content String? @db.Text
+  coverArt String?
+  description String? @db.Text
+
+  sku String? @unique
+
+  isPublished Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,11 +1,18 @@
-import { Home, LucideIcon, SquareTerminal, UserCog } from "lucide-react";
+import {
+  Grid2X2,
+  Home,
+  List,
+  LucideIcon,
+  SquareTerminal,
+  UserCog,
+} from "lucide-react";
 import { create } from "zustand";
 
 export type NavRoute = {
   label: string;
   path: string;
   icon: LucideIcon;
-}
+};
 
 type NavbarState = {
   routes: { label: string; path: string; icon: LucideIcon }[];
@@ -15,7 +22,7 @@ type NavbarState = {
 
 export const useNavbar = create<NavbarState>((set) => ({
   routes: [
-    { label: "Home", path: "/", icon: Home },
+    { label: "Projects", path: "/projects", icon: List },
     { label: "Console", path: "/console", icon: SquareTerminal },
   ],
   addRoute: (label, path, icon) =>

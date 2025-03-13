@@ -43,7 +43,7 @@ export default function Console({ serverUser }: any) {
   }, [_console.lines]);
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto max-h-[calc(100vh-12.75rem)] p-3 rounded-b-md scrollbar-thin">
+    <div className="w-full flex flex-col overflow-y-auto max-h-[calc(100vh-13.25rem)] py-3 pr-4 rounded-b-md scrollbar-thin">
       {_console.lines.map((line, index) => (
         <>
           {index !== _console.lines.length - 1 ? (

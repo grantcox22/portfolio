@@ -1,25 +1,52 @@
 "use client";
 
 import { CornerDownRight } from "lucide-react";
-import { ListItem } from "./list-item";
+import { ListItem } from "../../../components/list-item";
+import Link from "next/link";
+import { Category, Project } from "@prisma/client";
+import { ProjectDisplay } from "@/components/project";
 
-export default function Home({}) {
+interface HomeProps {
+  projects?: (Project & {
+    category: {
+      name: string;
+    }[];
+  })[];
+}
+
+export default function Home({ projects }: HomeProps) {
   return (
-    <div className="p-4 pt-6 text-clip space-y-6 relative bg-gradient-to-t h-full max-h-[calc(100vh-12.8rem)]">
-      {" "}
-      {/* <div className="absolute top-0 left-0 w-full h-full rounded-md crt opacity-10 z-50" /> */}
-      <section className="space-y-2">
+    <div className="py-6 text-clip space-y-8 relative bg-gradient-to-t h-full max-h-[calc(100vh-13.25rem)] overflow-auto">
+      <div className="h-40">// TODO: Add ascii art</div>
+
+      <section className="space-y-2" id="landing">
         <h1 className="text-3xl font-bold uppercase">
           Welcome to GCox.Dev
           <span className="animate-blink font-normal">|</span>
         </h1>
         <p>
           My name is <span className="text-green-500">Grant Cox</span>, and I am
-          an engineer from St. Louis MO
+          an engineering student from St. Louis MO
+          <a href="#about" className="ml-2 flex">
+            <CornerDownRight className="w-4 h-4 mt-1 mr-2" />
+            Read More
+          </a>
         </p>
       </section>
+      <section className="space-y-2" id="projects">
+        <h2 className="text-2xl font-bold">01 ~/Projects</h2>
+        <div className="space-y-4">
+          {projects?.map((project) => (
+            <ProjectDisplay key={project.id} project={project} />
+          ))}
+        </div>
+        <Link href="/projects" className="mt-6 flex">
+          <CornerDownRight className="w-4 h-4 mt-1 mr-2" />
+          See More Projects
+        </Link>
+      </section>
       <section className="space-y-2" id="about">
-        <h2 className="text-2xl font-bold">01 ~/README.md</h2>
+        <h2 className="text-2xl font-bold">02 ~/ABOUTME.md</h2>
         <p>
           I am a student at the{" "}
           <span className="text-green-500">
@@ -48,9 +75,6 @@ export default function Home({}) {
           <ListItem>PCB Design</ListItem>
         </ul>
       </section>
-      <section className="space-y-2" id="projects">
-        <h2 className="text-2xl font-bold">02 ~/Projects</h2>
-      </section>
       <section className="space-y-2" id="experience">
         <h2 className="text-2xl font-bold">03 ~/Experience</h2>
         <h3 className="text-xl font-bold">./IAME - St. Louis MO</h3>
@@ -59,7 +83,7 @@ export default function Home({}) {
             <span className="text-green-500">Lead Software Engineer</span>{" "}
             (December 2022 - Current)
           </p>
-          <ul className="pl-2">
+          <ul className="px-2">
             <ListItem>
               Led a development team of 4 people working on a custom learning
               management team

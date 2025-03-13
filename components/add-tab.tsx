@@ -3,6 +3,7 @@ import {
   ChevronDown,
   Home,
   Icon,
+  List,
   Plus,
   Square,
   SquareTerminal,
@@ -14,14 +15,14 @@ import { set } from "zod";
 
 const availableTabs: NavRoute[] = [
   {
-    path: "/",
-    icon: Home,
-    label: "New Tab",
-  },
-  {
     path: "/console",
     icon: SquareTerminal,
     label: "New Console",
+  },
+  {
+    path: "/projects",
+    icon: List,
+    label: "Projects",
   },
 ];
 
